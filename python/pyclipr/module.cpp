@@ -115,6 +115,37 @@ std::vector<Clipper2Lib::Path64> createPaths(const std::vector<const py::array_t
     return clipperPaths;
 }
 
+py::object simplifyPath(const py::array_t<double> &path, double epsilon, double scaleFactor, bool isOpenPath = false)
+{
+    if (scaleFactor < std::numeric_limits<double>::epsilon()) {
+        throw std::runtime_error("Scale factor cannot be zero");
+    }
+
+    Clipper2Lib::Path64 clipperPath = createPath(path, scaleFactor);
+    Clipper2Lib::Path64 simplifiedPath = Clipper2Lib::SimplifyPath(clipperPath, epsilon, isOpenPath);
+
+    EigenVec2d simpPathOut = path2EigenVec2d(simplifiedPath, scaleFactor);
+    return py::cast(simpPathOut);
+}
+
+py::object simplifyPaths(std::vector<const py::array_t<double>> &paths, double epsilon, double scaleFactor, bool isOpenPath = false)
+{
+    if (scaleFactor < std::numeric_limits<double>::epsilon()) {
+        throw std::runtime_error("Scale factor cannot be zero");
+    }
+
+    std::vector<Clipper2Lib::Path64> clipperPaths = createPaths(paths, scaleFactor);
+    std::vector<Clipper2Lib::Path64> simpPaths =  Clipper2Lib::SimplifyPaths(clipperPaths, epsilon, isOpenPath);
+
+    std::vector<EigenVec2d> simpPathsOut;
+    for (auto simpPath : simpPaths) {
+        EigenVec2d simpPathOut = path2EigenVec2d(simpPath, scaleFactor);
+        simpPathsOut.push_back(simpPathOut);
+    }
+
+    return py::cast(simpPathsOut);
+}
+
 bool orientation(const py::array_t<double> &path, const double scaleFactor)
 {
     if (scaleFactor < std::numeric_limits<double>::epsilon()) {
