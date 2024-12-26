@@ -64,9 +64,8 @@ pyclipr::EigenVec2d path2EigenVec2d(const Clipper2Lib::Path64 &path, double scal
     return eigPath;
 }
 
+Clipper2Lib::Path64 createPath(const py::array_t<double> &path, double scaleFactor)
 {
-
-    Clipper2Lib::Path64 p;
 
     if (path.ndim() != 2)
         throw std::runtime_error("Number of dimensions must be two");
@@ -74,10 +73,12 @@ pyclipr::EigenVec2d path2EigenVec2d(const Clipper2Lib::Path64 &path, double scal
     if (!(path.shape(1) == 2 || path.shape(1) == 3))
         throw std::runtime_error("Path must be nx2, or nx3");
 
+    auto r = path.unchecked<2>();
+
+    Clipper2Lib::Path64 p;
+
     // Resize the path list
     p.reserve(path.shape(0));
-
-    auto r = path.unchecked<2>();
 
     if(path.shape(1) == 2) {
         for(uint64_t i=0; i < path.shape(0); i++)
@@ -88,6 +89,9 @@ pyclipr::EigenVec2d path2EigenVec2d(const Clipper2Lib::Path64 &path, double scal
             p.push_back(Clipper2Lib::Point64(r(i,0) * scaleFactor, r(i,1) * scaleFactor, r(i,2)));
 
     }
+    return p;
+}
+
 
 bool orientation(const py::array_t<double> &path, const double scaleFactor)
 {
@@ -256,7 +260,6 @@ public:
                     eigPath(i,1) = double(path[i].y) / double(scaleFactor);
 
                     if(returnZ) {
-                        //std::cout << "OP: assign z" << path[i].z;
                         eigPathZ(i) = path[i].z;
                     }
                 }
@@ -459,7 +462,6 @@ PYBIND11_MODULE(pyclipr, m) {
 
 
 	m.attr("clipperVersion")= CLIPPER2_VERSION;
-
 
     py::class_<Clipper2Lib::PolyPath>(m, "PolyPath")
         /*.def(py::init<>()) */
