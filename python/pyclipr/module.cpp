@@ -51,19 +51,19 @@ static void myZCB(const Clipper2Lib::Point64& e1bot, const Clipper2Lib::Point64&
     pt.z = maxZ;
 };
 
+pyclipr::EigenVec2d path2EigenVec2d(const Clipper2Lib::Path64 &path, double scaleFactor) {
 
+    pyclipr::EigenVec2d eigPath(path.size(), 2);
 
-Clipper2Lib::Path64 simplifyPath(const Clipper2Lib::Path64 &path, double epsilon, bool isOpenPath = false)
-{
-    return Clipper2Lib::SimplifyPath(path, epsilon, isOpenPath);
+    for (uint64_t i=0; i<path.size(); i++) {
+        eigPath(i,0) = path[i].x;
+        eigPath(i,1) = path[i].y;
+    }
+    eigPath *= scaleFactor;
+
+    return eigPath;
 }
 
-Clipper2Lib::Paths64 simplifyPaths(const Clipper2Lib::Paths64 &paths, double epsilon, bool isOpenPath = false)
-{
-    return Clipper2Lib::SimplifyPaths(paths, epsilon, isOpenPath);
-}
-
-bool orientation(const py::array_t<double> &path, const float scaleFactor = 1000)
 {
 
     Clipper2Lib::Path64 p;
