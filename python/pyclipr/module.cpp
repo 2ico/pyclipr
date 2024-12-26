@@ -89,6 +89,14 @@ pyclipr::EigenVec2d path2EigenVec2d(const Clipper2Lib::Path64 &path, double scal
 
     }
 
+bool orientation(const py::array_t<double> &path, const double scaleFactor)
+{
+    if (scaleFactor < std::numeric_limits<double>::epsilon()) {
+        throw std::runtime_error("Scale factor cannot be zero");
+    }
+
+    Clipper2Lib::Path64 p = createPath(path, scaleFactor);
+
     return Clipper2Lib::IsPositive(p);
 }
 
