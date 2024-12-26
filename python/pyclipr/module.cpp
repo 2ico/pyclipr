@@ -92,6 +92,28 @@ Clipper2Lib::Path64 createPath(const py::array_t<double> &path, double scaleFact
     return p;
 }
 
+std::vector<Clipper2Lib::Path64> createPaths(const std::vector<const py::array_t<double>> &paths, double scaleFactor)  {
+
+    /* Check all array of paths have a consistent size and dimension */
+    int numDims = paths[0].ndim();
+    int numCols = paths[0].shape(1);
+
+    for (auto path: paths) {
+        if (path.ndim() != numDims)
+            throw std::runtime_error("All paths must have same numpy dimensions");
+
+        if (path.shape(1) != numCols)
+            throw std::runtime_error("All paths must have same number of dimensions");
+    }
+
+    std::vector<Clipper2Lib::Path64> clipperPaths;
+    for (auto path: paths) {
+        const Clipper2Lib::Path64 & cPath = createPath(path, scaleFactor);
+        clipperPaths.push_back(cPath);
+    }
+
+    return clipperPaths;
+}
 
 bool orientation(const py::array_t<double> &path, const double scaleFactor)
 {
