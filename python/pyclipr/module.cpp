@@ -193,14 +193,14 @@ py::object polyTreeToPathsD(const Clipper2Lib::PolyPathD &polytree)
 }
 
 void applyScaleFactor(const Clipper2Lib::PolyPath64 & polyPath,
-                      Clipper2Lib::PolyPathD &newPath, uint64_t scaleFactor, bool invert = true) {
-// Create a recursive copy of the structure
+                      Clipper2Lib::PolyPathD &newPath, double scaleFactor, bool invert = true) {
+    // Create a recursive copy of the structure
 
     for(uint64_t i = 0; i < polyPath.Count(); i++)
     {
         Clipper2Lib::Path64 path = polyPath[i]->Polygon();
         Clipper2Lib::PolyPathD pathD;
-        newPath.SetScale(1.0 / double(scaleFactor));
+        newPath.SetScale(1.0 / scaleFactor);
 
         auto newChild = newPath.AddChild(path);
 
@@ -214,7 +214,8 @@ class Clipper : public Clipper2Lib::Clipper64 {
 
 public:
 
-    Clipper() : Clipper2Lib::Clipper64(), scaleFactor(1000.0) {
+    Clipper() : Clipper2Lib::Clipper64(), scaleFactor(1000.0)
+    {
         this->SetZCallback(myZCB);
     }
     ~Clipper() {}
@@ -223,8 +224,8 @@ public:
 public:
 
    void addPath(const py::array_t<double> &path,
-                 Clipper2Lib::PathType polyType,
-                 bool isOpen)
+                Clipper2Lib::PathType polyType,
+                bool isOpen)
     {
         Clipper2Lib::Path64 p;
 
@@ -262,6 +263,18 @@ public:
 
     void cleanUp() { this->CleanUp(); }
     void clear() { this->Clear(); }
+
+    void setScaleFactor(const double scaleFactor) {
+        if (scaleFactor < std::numeric_limits<double>::epsilon()) {
+            throw std::runtime_error("Scale factor cannot be zero");
+        }
+
+        this->scaleFactor = scaleFactor;
+    }
+    void setPreserveCollinear(bool val) { this->PreserveCollinear(val); }
+
+    double getScaleFactor() const {  return this->scaleFactor; }
+    bool getPreserveCollinear() const { return this->PreserveCollinear(); }
 
     py::object execute(const Clipper2Lib::ClipType clipType, const Clipper2Lib::FillRule fillRule,
                        bool returnOpenPaths = false, bool returnZ = false) {
@@ -377,17 +390,17 @@ public:
 
     }
 
-public:
-    uint64_t scaleFactor;
+protected:
+    double scaleFactor;
 };
-
 
 
 class ClipperOffset : public Clipper2Lib::ClipperOffset {
 
 public:
-    // Consturctor and destructor
-    ClipperOffset() : Clipper2Lib::ClipperOffset(), scaleFactor(1000.0) {}
+
+    ClipperOffset() : Clipper2Lib::ClipperOffset(), scaleFactor(1000.0)
+    {
     ~ClipperOffset() {}
 
 public:
@@ -420,6 +433,16 @@ public:
         this->AddPath(p, joinType, endType);
 
     }
+
+    void setScaleFactor(const double scaleFactor) {
+        if (scaleFactor < std::numeric_limits<double>::epsilon()) {
+            throw std::runtime_error("Scale factor cannot be zero");
+        }
+
+        this->scaleFactor = scaleFactor;
+    }
+
+    double getScaleFactor() const {  return this->scaleFactor; }
 
     void addPaths(const std::vector<pybind11::array_t<double>> paths,
                   const Clipper2Lib::JoinType joinType,
@@ -496,8 +519,8 @@ public:
         return polytreeCpy;
     }
 
-public:
-    uint64_t scaleFactor;
+protected:
+    double scaleFactor;
 };
 
 } // end of namespace pyclipr
