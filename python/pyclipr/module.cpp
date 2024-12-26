@@ -26,7 +26,6 @@ typedef Eigen::Matrix<double,Eigen::Dynamic,1>   EigenVec1d;
 typedef Eigen::Matrix<double,Eigen::Dynamic,2>   EigenVec2d;
 typedef Eigen::Matrix<double,Eigen::Dynamic,3>   EigenVec3d;
 
-
 static void myZCB(const Clipper2Lib::Point64& e1bot, const Clipper2Lib::Point64& e1top,
                   const Clipper2Lib::Point64& e2bot, const Clipper2Lib::Point64& e2top,
                   Clipper2Lib::Point64& pt) {
@@ -93,14 +92,39 @@ bool orientation(const py::array_t<double> &path, const float scaleFactor = 1000
     return Clipper2Lib::IsPositive(p);
 }
 
-Clipper2Lib::Paths64 polyTreeToPaths64(const Clipper2Lib::PolyTree64 &polytree)
+py::object polyTreeToPaths64(const Clipper2Lib::PolyTree64 &polytree, double scaleFactor = 1.0)
 {
-    return Clipper2Lib::PolyTreeToPaths64(polytree);
+    auto paths = Clipper2Lib::PolyTreeToPaths64(polytree);
+
+    std::vector<EigenVec2d> closedOut;
+
+    for (auto &path : paths) {
+        auto eigPath = path2EigenVec2d(path, scaleFactor);
+        closedOut.push_back(eigPath);
+    }
+
+    return py::cast(closedOut);
 }
 
-Clipper2Lib::PathsD polyTreeToPathsD(const Clipper2Lib::PolyTreeD &polytree)
+py::object polyTreeToPathsD(const Clipper2Lib::PolyPathD &polytree)
 {
-    return Clipper2Lib::PolyTreeToPathsD(polytree);
+    auto paths = Clipper2Lib::PolyTreeToPathsD(polytree);
+
+    std::vector<EigenVec2d> closedOut;
+
+    for (auto &path : paths) {
+
+        EigenVec2d eigPath(path.size(), 2);
+
+        for (uint64_t i=0; i<path.size(); i++) {
+            eigPath(i,0) = double(path[i].x);
+            eigPath(i,1) = double(path[i].y);
+        }
+
+        closedOut.push_back(eigPath);
+    }
+
+    return py::cast(closedOut);
 }
 
 void applyScaleFactor(const Clipper2Lib::PolyPath64 & polyPath,
