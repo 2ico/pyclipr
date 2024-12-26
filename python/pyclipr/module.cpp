@@ -443,6 +443,13 @@ public:
     }
 
     double getScaleFactor() const {  return this->scaleFactor; }
+    double getArcTolerance() const { return this->ArcTolerance(); }
+    double getMiterLimit() const { return this->MiterLimit(); }
+    bool getPreserveCollinear() const { return this->PreserveCollinear(); }
+
+    void setMiterLimit(double val) { this->MiterLimit(val); }
+    void setArcTolerance(double val) { this->ArcTolerance(val); }
+    void setPreserveCollinear(bool val) { this->PreserveCollinear(val); }
 
     void addPaths(const std::vector<pybind11::array_t<double>> paths,
                   const Clipper2Lib::JoinType joinType,
