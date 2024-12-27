@@ -808,10 +808,8 @@ PYBIND11_MODULE(pyclipr, m) {
             'smoothness' up to a point though at a cost of performance and in creating more vertices to construct the arc.
 
             The default ArcTolerance is 0.25 units. This means that the maximum distance the flattened path will deviate
-            from the 'true' arc will be no more than 0.25 units (before rounding). )"
-        )
-        .def_property("miterLimit", [](const Clipper2Lib::ClipperOffset &s ) { return s.MiterLimit();}
-                                  , []( Clipper2Lib::ClipperOffset &s, double val ) { return s.MiterLimit(val);}, R"(
+            from the 'true' arc will be no more than 0.25 units (before rounding). )"  )
+        .def_property("miterLimit", &pyclipr::ClipperOffset::getMiterLimit, &pyclipr::ClipperOffset::setMiterLimit,  R"(
              This property sets the maximum distance in multiples of delta that vertices can be offset from their original
              positions before squaring is applied. (Squaring truncates a miter by 'cutting it off' at 1 x delta distance
              from the original vertex.)
@@ -820,36 +818,34 @@ PYBIND11_MODULE(pyclipr, m) {
         )
         .def_property("preserveCollinear", &pyclipr::ClipperOffset::getPreserveCollinear, &pyclipr::ClipperOffset::setPreserveCollinear, R"(
              By default, when three or more vertices are collinear in input polygons (subject or clip),
-             the Clipper object removes the 'inner' vertices before clipping. When enabled the PreserveCollinear property
+             the Clipper object removes the 'inner' vertices before clipping. When enabled the `PreserveCollinear` property
              prevents this default behavior to allow these inner vertices to appear in the solution. )"
          )
         .def("addPath", &pyclipr::ClipperOffset::addPath, py::arg("path"),
-                         py::arg("joinType"),
-                         py::arg("endType") = Clipper2Lib::EndType::Polygon, R"(
+                                                          py::arg("joinType"),
+                                                          py::arg_v("endType", Clipper2Lib::EndType::Polygon, "Endtype.Polygon"),  R"(
             The addPath method adds one open or closed paths (polygon) to the ClipperOffset object.
 
             :param path: A list of 2D points (x,y) that define the path. Tuple or a numpy array may be provided for the path
-            :param joinType: The JoinType to use for the offseting / inflation of paths
-            :param endType: The EndType to use for the offseting / inflation of paths (default is Polygon)
+            :param joinType: The JoinType to use for the offsetting / inflation of paths
+            :param endType: The EndType to use for the offsetting / inflation of paths (default is Polygon)
             :return: None )"
         )
         .def("addPaths", &pyclipr::ClipperOffset::addPaths, py::arg("path"),
-                          py::arg("joinType"),
-                          py::arg("endType") = Clipper2Lib::EndType::Polygon, R"(
+                                                            py::arg("joinType"),
+                                                            py::arg_v("endType", Clipper2Lib::EndType::Polygon, "Endtype.Polygon"), R"(
             The addPath method adds one or more open / closed paths to the ClipperOffset object.
 
             :param path: A list of paths consisting of 2D points (x,y) that define the path. Tuple or a numpy array may be provided for each path
-            :param joinType: The JoinType to use for the offseting / inflation of paths
-            :param endType: The EndType to use for the offseting / inflation of paths
+            :param joinType: The JoinType to use for the offsetting / inflation of paths
+            :param endType: The EndType to use for the offsetting / inflation of paths
             :return: None)"
         )
         .def("execute", &pyclipr::ClipperOffset::execute,  py::arg("delta"), py::return_value_policy::take_ownership, R"(
             The `execute` method performs the offsetting/inflation operation on the polygons or paths that have been added
-                          py::return_value_policy::take_ownership, R"(
-            The `execute` method performs the offseting/inflation operation on the polygons or paths that have been added
             to the clipper object. This method will return a list of paths from the result.
 
-            :param delta: The offset to apply to the inflation/offseting of paths and segments
+            :param delta: The offset to apply to the inflation/offsetting of paths and segments
             :return: The resultant offset paths
         )")
         .def("execute2", &pyclipr::ClipperOffset::execute2,  py::arg("delta"),  py::return_value_policy::take_ownership, R"(
