@@ -346,12 +346,12 @@ public:
     py::object execute2(const Clipper2Lib::ClipType clipType, const Clipper2Lib::FillRule fillRule,
                         const bool returnOpenPaths = false, const bool returnZ = false) {
 
-        Clipper2Lib::PolyTree64 polytree;
+        Clipper2Lib::PolyPath64 polytree;
         Clipper2Lib::Paths64 openPaths;
 
         this->Execute(clipType, fillRule, polytree, openPaths);
 
-        Clipper2Lib::PolyTreeD *polytreeCpy = new Clipper2Lib::PolyTreeD();
+        Clipper2Lib::PolyPathD *polytreeCpy = new Clipper2Lib::PolyPathD();
 
         applyScaleFactor(polytree, *polytreeCpy, scaleFactor);
 
@@ -401,13 +401,15 @@ public:
 
     ClipperOffset() : Clipper2Lib::ClipperOffset(), scaleFactor(1000.0)
     {
+
+    }
     ~ClipperOffset() {}
 
 public:
 
     void addPath(const pybind11::array_t<double>& path,
-                 const Clipper2Lib::JoinType joinType,
-                 const Clipper2Lib::EndType endType = Clipper2Lib::EndType::Polygon)
+                            const Clipper2Lib::JoinType joinType,
+                            const Clipper2Lib::EndType endType = Clipper2Lib::EndType::Polygon)
     {
         Clipper2Lib::Path64 p;
 
@@ -489,7 +491,7 @@ public:
 
     void clear() { this->Clear(); }
 
-    std::vector<EigenVec2d> execute(const double delta) {
+    py::object  execute(const double delta) {
 
         Clipper2Lib::Paths64 closedPaths;
 
@@ -509,17 +511,16 @@ public:
             closedOut.push_back(eigPath);
         }
 
-
-        return closedOut;
+        return py::cast(closedOut);
     }
 
-    Clipper2Lib::PolyTreeD * execute2(const double delta) {
+    Clipper2Lib::PolyPathD * execute2(const double delta) {
 
-        Clipper2Lib::PolyTree64 polytree;
+        Clipper2Lib::PolyPath64 polytree;
 
         this->Execute(delta * scaleFactor, polytree);
 
-        Clipper2Lib::PolyTreeD *polytreeCpy = new Clipper2Lib::PolyTreeD();
+        Clipper2Lib::PolyPathD *polytreeCpy = new Clipper2Lib::PolyPathD();
 
         applyScaleFactor(polytree, *polytreeCpy, scaleFactor);
 
@@ -555,7 +556,7 @@ PYBIND11_MODULE(pyclipr, m) {
         /* .def(py::init<>()) */
         .def_property_readonly("isHole", &Clipper2Lib::PolyPath64::IsHole)
         .def_property_readonly("area",   &Clipper2Lib::PolyPath64::Area)
-        .def_property_readonly("attributes", [](const Clipper2Lib::PolyPath64 &s ) {
+        .def_property_readonly("attributes", [](const Clipper2Lib::PolyPath64 &s ) -> py::object {
             Clipper2Lib::Path64 path = s.Polygon();
 
             pyclipr::EigenVec1d eigPath(path.size(), 1);
@@ -563,9 +564,9 @@ PYBIND11_MODULE(pyclipr, m) {
             for (uint64_t i=0; i<path.size(); i++)
                 eigPath(i,0) = path[i].z;
 
-            return eigPath;
+            return py::cast(eigPath);
         })
-        .def_property_readonly("polygon", [](const Clipper2Lib::PolyPath64 &s ) {
+        .def_property_readonly("polygon", [](const Clipper2Lib::PolyPath64 &s ) -> py::object {
             Clipper2Lib::Path64 path = s.Polygon();
 
             pyclipr::EigenVec2d eigPath(path.size(), 3);
@@ -575,7 +576,7 @@ PYBIND11_MODULE(pyclipr, m) {
                 eigPath(i,1) = path[i].y;
                 //eigPath(i,2) = path[i].z;
             }
-            return eigPath;
+            return py::cast(eigPath);
         })
         .def_property_readonly("children", [](const Clipper2Lib::PolyPath64 &s ) {
             std::vector<const Clipper2Lib::PolyPath64 *> children;
@@ -593,7 +594,7 @@ PYBIND11_MODULE(pyclipr, m) {
             /* .def(py::init<>()) */
             .def_property_readonly("isHole", &Clipper2Lib::PolyPathD::IsHole)
             .def_property_readonly("area",   &Clipper2Lib::PolyPathD::Area)
-            .def_property_readonly("attributes", [](const Clipper2Lib::PolyPathD &s ) {
+            .def_property_readonly("attributes", [](const Clipper2Lib::PolyPathD &s) -> py::object {
                 Clipper2Lib::PathD path = s.Polygon();
 
                 pyclipr::EigenVec1d eigPath(path.size(), 1);
@@ -601,9 +602,9 @@ PYBIND11_MODULE(pyclipr, m) {
                 for (uint64_t i=0; i<path.size(); i++)
                     eigPath(i,0) = path[i].z;
 
-                return eigPath;
+                return py::cast(eigPath);
             })
-            .def_property_readonly("polygon", [](const Clipper2Lib::PolyPathD &s ) {
+            .def_property_readonly("polygon", [](const Clipper2Lib::PolyPathD &s ) ->  py::object {
                 Clipper2Lib::PathD path = s.Polygon();
 
                 pyclipr::EigenVec2d eigPath(path.size(), 2);
@@ -611,9 +612,8 @@ PYBIND11_MODULE(pyclipr, m) {
                 for (uint64_t i=0; i<path.size(); i++) {
                     eigPath(i,0) = path[i].x;
                     eigPath(i,1) = path[i].y;
-                    //eigPath(i,2) = path[i].z;
                 }
-                return eigPath;
+                return py::cast(eigPath);
             })
             .def_property_readonly("children", [](const Clipper2Lib::PolyPathD &s ) {
                 std::vector<const Clipper2Lib::PolyPathD *> children;
@@ -623,7 +623,7 @@ PYBIND11_MODULE(pyclipr, m) {
                 return children;
             })
             .def_property_readonly("count", &Clipper2Lib::PolyPathD::Count)
-            .def("__len__", [](const Clipper2Lib::PolyTreeD &s ) { return s.Count(); });
+            .def("__len__", [](const Clipper2Lib::PolyPathD &s ) { return s.Count(); });
 
 
     m.def("polyTreeToPaths64", &pyclipr::polyTreeToPaths64, py::return_value_policy::automatic)
