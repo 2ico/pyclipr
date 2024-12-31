@@ -7,3 +7,6 @@
 [submodule "external/clipper2"]
 	path = external/clipper2
 	url = https://github.com/AngusJohnson/Clipper2.git
+[submodule "external/nanobind"]
+	path = external/nanobind
+	url = https://github.com/wjakob/nanobind.git
