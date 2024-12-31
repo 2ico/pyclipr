@@ -3,7 +3,7 @@ name = "pyclipr"
 description = "Python library for polygon clipping and offsetting based on Clipper2"
 readme = "README.rst"
 license = {file = "LICENSE"}
-requires-python = ">=3.9"
+requires-python = ">=3.8"
 authors = [
     { name = "Luke Parry", email = "dev@lukeparry.uk" },
     { name = "Luktug", email = "contact@luktug.co.uk" }
@@ -25,10 +25,12 @@ keywords= [
 
 classifiers = [
     "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
 ]
 
@@ -44,7 +46,7 @@ Issues = "https://github.com/drlukeparry/pyclipr/issues"
 Changelog = "https://github.com/drlukeparry/pyclipr/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
-path = "python/pyclipr/version.py"
+path = "source/pyclipr/version.py"
 
 [build-system]
 build-backend = "hatchling.build"
@@ -56,8 +58,7 @@ requires = [
     "numpy>1.21",
     "cmake>=3.15",
     "setuptools",
-    "pybind11>=2.13",
-    "pybind11-stubgen",
+    "nanobind>=2.4",
     'hatch-build-scripts'
 ]
 
@@ -69,7 +70,7 @@ messages.after-failure = """{bold.red}Sorry{normal}, build failed. Your platform
 experimental = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["python/pyclipr"]
+packages = ["source/pyclipr"]
 artifacts = [
   "*.so",
   "*.pyi",
@@ -81,7 +82,7 @@ commands = [
     "git submodule update --init --recursive",
     "cd external/clipper2 && git checkout Clipper2_1.4.0",
     "cd external/eigen && git checkout 3.4",
-    "cd external/pybind11 && git checkout v2.13"
+    "cd external/nanobind && git checkout v2.4.0"
 ]
 artifacts = []
 
