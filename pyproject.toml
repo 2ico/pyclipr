@@ -52,13 +52,7 @@ requires = [
     "hatchling>=1.27",
     "scikit-build-core~=0.10",
     "wheel",
-    "ninja",
-    "numpy>1.21",
-    "cmake>=3.15",
-    "setuptools",
-    "pybind11>=2.13",
-    "pybind11-stubgen",
-    'hatch-build-scripts'
+    "numpy>=1.21"
 ]
 
 
@@ -78,10 +72,11 @@ artifacts = [
 
 [[tool.hatch.build.targets.sdist.hooks.build-scripts.scripts]]
 commands = [
+    "git fetch",
     "git submodule update --init --recursive",
-    "cd external/clipper2 && git checkout Clipper2_1.4.0",
-    "cd external/eigen && git checkout 3.4",
-    "cd external/pybind11 && git checkout v2.13"
+    "cd external/clipper2 && git fetch --tags && git checkout Clipper2_1.5.4",
+    "cd external/eigen && git fetch --tags && git checkout 3.4.0",
+    "cd external/pybind11 && git fetch --tags && git checkout v2.13.6"
 ]
 artifacts = []
 
