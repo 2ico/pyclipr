@@ -9,8 +9,8 @@ Pyclipr - Python Polygon and Offsetting Library (Clipper2 Bindings)
  :target: https://pepy.tech/project/pyclipr
 
 
-Pyclipr is a Python library offering the functionality of the `Clipper2 <http://www.angusj.com/clipper2/Docs/Overview.htm>`_
-polygon clipping and offsetting library and are built upon `pybind <https://pybind11.readthedocs.io/en/stable/basics.html>`_ .
+Pyclipr is a Python library offering the functionality of the`Clipper2 <http://www.angusj.com/clipper2/Docs/Overview.htm>`_
+polygon clipping and offsetting library and are built upon `nanobind <nanobind vs pybind11>`_ .
 The underlying Clipper2 library performs intersection, union, difference and XOR boolean operations on both simple and
 complex polygons and also performs offsetting of polygons and inflation of paths.
 
@@ -18,13 +18,14 @@ Unlike `pyclipper <https://pypi.org/project/pyclipper/>`_, this library is not b
 capability pybind is exploited. This library aims to provide convenient access to the Clipper2 library for Python users,
 especially with its usage in 3D Printing and computer graphics applications.
 
-For further information, see the latest `release notes <https://github.com/drlukeparry/pycork/blob/master/CHANGELOG.md>`_.
+For further information, see the latest `release notes <https://github.com/drlukeparry/pyclipr/blob/master/CHANGELOG.md>`_.
 
 Installation
 *************
 
-Installation using pre-built packages are currently supported on Windows, Mac but excludes Linux because pre-built
-packages are unsupported via PyPi. Otherwise, no special requirements or prerequisites are necessary.
+Installation using pre-built packages are currently supported on Windows, Mac but excludes Linux because compiled
+packages are not natively supported due to differences in dependency management for each Linux distribution via PyPi.
+Otherwise, no special requirements or prerequisites are necessary.
 
 .. code:: bash
 
@@ -41,8 +42,8 @@ Alternatively, pyclipr may be compiled directly from source within the python en
 are the a compliant c++ build environment include CMake build system (>v3.15) and the availability of a compiler with
 c++17 compatibility.  Currently the package has been tested built using Windows 10, using VS2019 and Mac OSX Sonoma.
 
-Firstly, clone the PyClipr repository whilst ensuring that you perform the recurisve submodule when initialising
-the repoistory. This ensures that all dependencies (pybind, pyclipr, eigen, fmt) are downloaded into the source tree.
+Firstly, clone the PyClipr repository whilst ensuring that you perform the recursive submodule when initialising
+the repository. This ensures that all dependencies (nanobind, clipeprLib, eigen) are cloned into the source tree.
 
 .. code:: bash
 
@@ -54,15 +55,15 @@ the repoistory. This ensures that all dependencies (pybind, pyclipr, eigen, fmt)
 Usage
 ******
 
-The pyclipr library follows similar structure to that documented in `Clipper2 <http://www.angusj.com/clipper2/Docs/Overview.htm>`_ library.
-Although for consistency most methods are implemented using camelcase naming convention and more generic functions
-are provided for the addition of paths.
+The pyclipr library follows similar structure to that documented in `Clipper2 <http://www.angusj.com/clipper2/Docs/Overview.htm>`_
+library. Although for consistency most methods are implemented using camelcase naming convention and more generic
+functions are provided for the addition of paths.
 
-The library assumes that coordinates are provided and scaled by a ``scaleFactor``  (*default = 1e3*), set within
-the ``Clipper`` and ``ClipperOffset`` classes to ensure correct numerical robustness outlined in the underlying Clipper library.
-The coordinates for the paths may be provided as a list of tuples or a numpy array.
+The library assumes that coordinates are provided and scaled by a``scaleFactor``  (*default = 1e3*), set within
+the ``Clipper`` and ``ClipperOffset`` classes to ensure correct numerical robustness outlined in the underlying Clipper
+library. The coordinates for the paths may be provided as a list of tuples or a numpy array.
 
-Both ``Path64`` and ``PolyTree64`` structures are supported from the clipping and offseting operations, which are enacted
+Both ``Path64`` and ``PolyTree64`` structures are supported from the clipping and offsetting operations, which are enacted
 by using either `execute` or `execute2` methods, respectively.
 
 .. code:: python
@@ -105,7 +106,7 @@ by using either `execute` or `execute2` methods, respectively.
     out3 = pc.execute(pyclipr.Difference, pyclipr.FillRule.EvenOdd)
     out4 = pc.execute(pyclipr.Xor, pyclipr.FillRule.EvenOdd)
 
-    # Using execute2 returns a PolyTree structure that provides hierarchical information inflormation
+    # Using execute2 returns a PolyTree structure that provides hierarchical information
     # if the paths are interior or exterior
     outB = pc.execute2(pyclipr.Intersection, pyclipr.FillRule.EvenOdd)
 

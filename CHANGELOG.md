@@ -5,10 +5,24 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- Added method `createPath` and `createPaths` to the clipper class to create a path from a list of points
+- Automatic generation of pybind stubs (.pyi) for the Clipper class
 
 ### Fixed
+- Changed internal scaleFactor to be a double in Clipper and ClipperOffset classes, which was implicitly type casted previously
+- `simplifyPaths` is now correctly implemented in the Clipper class
+- Removed  default scaleFactor for orientation method
+- Added a check to ensure that the scaleFactor is a positive scalar value in most methods
+- `Clipper::scaleFactor` and `ClipperOffset::scaleFactor` are now protected members
+- `applyScaleFactor` uses a double precision scale factor
+- Removal of unused git submodules (fmt, filesystem) not required on the project
 
 ### Changed
+- Updated to use `pyproject.toml`  for python package and wheel building
+- Updated to use ClipperLib Version 1.4.0 
+- Updated to use pybind11 Version 2.13.0
+- Updated to minimum version of Python 3.9
+- Removal of setup.py
 
 ## [0.1.7] - 2024-01-11
 
