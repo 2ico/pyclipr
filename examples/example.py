@@ -49,7 +49,7 @@ pc.addPath(np.array(path3), pyclipr.Clip)
 
 """
 Perform Polygon Clipping 
-The fill rule is optional and by defualt in ClipperLib is set to EvenOdd
+The fill rule is optional and by default in ClipperLib is set to EvenOdd
 """
 
 out = pc.execute(pyclipr.Intersection)
