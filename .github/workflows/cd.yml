@@ -16,7 +16,41 @@ on:
       - main
 
 jobs:
-
+  build-source:
+    name: Build all wheels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-tags: true
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Display Python version
+        run: python3 -c "import sys; print(sys.version)"
+      - name: Install dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -U setuptools flit build twine hatchling wheel
+          pip install -U  numpy==1.26 scikit-build-core hatch-build-scripts pybind11_stubgen scikit-build
+      - name: Install APT On Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update -qq -y
+          sudo apt-get install -qq -y libglu1-mesa build-essential ninja-build libeigen3-dev
+      - name: Build wheel
+        run: |
+          python -m build -n -s
+      - name: Twine check
+        run: |
+          twine check dist/*
+      - name: Upload source distributions
+        uses: actions/upload-artifact@v4
+        with:
+          path: dist
+          name: all_wheels
   build-wheels:
     name: Build all wheels
     runs-on: ${{ matrix.os }}
@@ -24,15 +58,6 @@ jobs:
       matrix:
         python-version: [3.9, '3.10', '3.11', '3.12']
         os: [ubuntu-latest, macos-13, macos-14, windows-latest]
-        exclude:
-        - os: windows-latest
-          python-version: '3.12'
-        - os: ubuntu-latest
-          python-version: '3.12'
-        - os: macos-13
-          python-version: '3.12'
-        - os: macos-14
-          python-version: '3.12'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,6 +73,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -U setuptools flit build twine hatchling wheel
+          pip install -U  numpy==1.26 scikit-build-core hatch-build-scripts pybind11_stubgen scikit-build
       - name: Install APT On Linux
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -57,14 +83,6 @@ jobs:
         if: matrix.os == 'macos-14' || matrix.os == 'macos-13'
         run: |
           brew install eigen cmake ninja
-
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install -U  numpy==1.26 scikit-build-core hatch-build-scripts pip install pybind11-stubgen
-      - name: Create source distribution
-        run: |
-          python -m build -n -s
       - name: Build wheel
         run: |
           python -m build -n -w
@@ -75,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: dist
-          name: all_wheels
+          name: wheel-${{ matrix.os }}-${{ matrix.python-version }}
 
   publish:
     name: Publish to Github and Pypi
@@ -89,7 +107,7 @@ jobs:
       with:
         python-version: '3.12'
     - name: Download assets
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         path: dist
     - name: Flatten dist dir

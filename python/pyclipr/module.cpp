@@ -92,9 +92,10 @@ Clipper2Lib::Path64 createPath(const py::array_t<double> &path, double scaleFact
     return p;
 }
 
-std::vector<Clipper2Lib::Path64> createPaths(const std::vector<const py::array_t<double>> &paths, double scaleFactor)  {
+std::vector<Clipper2Lib::Path64> createPaths(const std::vector<py::array_t<double>> &paths, double scaleFactor)  {
 
     /* Check all array of paths have a consistent size and dimension */
+
     int numDims = paths[0].ndim();
     int numCols = paths[0].shape(1);
 
@@ -128,7 +129,7 @@ py::object simplifyPath(const py::array_t<double> &path, double epsilon, double 
     return py::cast(simpPathOut);
 }
 
-py::object simplifyPaths(std::vector<const py::array_t<double>> &paths, double epsilon, double scaleFactor, bool isOpenPath = false)
+py::object simplifyPaths(std::vector<py::array_t<double>> &paths, double epsilon, double scaleFactor, bool isOpenPath = false)
 {
     if (scaleFactor < std::numeric_limits<double>::epsilon()) {
         throw std::runtime_error("Scale factor cannot be zero");

@@ -50,8 +50,11 @@ path = "python/pyclipr/version.py"
 build-backend = "hatchling.build"
 requires = [
     "hatchling>=1.27",
-    "scikit-build-core~=0.10",
+    "scikit-build",
+    "scikit-build-core>=0.10",
     "wheel",
+    "hatch-build-scripts",
+    "pybind11_stubgen",
     "numpy>=1.21"
 ]
 

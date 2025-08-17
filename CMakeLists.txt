@@ -189,7 +189,7 @@ if(BUILD_PYTHON)
     add_custom_command(
         TARGET pyclipr
         POST_BUILD
-        COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/pybind11stubgen.py && ls
+        COMMAND ls && python ${CMAKE_CURRENT_SOURCE_DIR}/pybind11stubgen.py
         WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR}
         COMMENT "Running pybind11-stubgen"
     )
