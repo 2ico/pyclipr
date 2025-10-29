@@ -1,8 +1,8 @@
 Pyclipr - Python Polygon and Offsetting Library (Clipper2 Bindings)
 ========================================================================
 
-.. image:: https://github.com/drlukeparry/pyclipr/actions/workflows/pythonpublish.yml/badge.svg
-    :target: https://github.com/drlukeparry/pyclipr/actions
+.. image:: https://github.com/2ico/pyclipr/actions/workflows/pythonpublish.yml/badge.svg
+    :target: https://github.com/2ico/pyclipr/actions
 .. image:: https://badge.fury.io/py/pyclipr.svg
     :target: https://badge.fury.io/py/pyclipr
 .. image:: https://static.pepy.tech/personalized-badge/pyclipr?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads
@@ -35,14 +35,14 @@ Installation of `pyclipr` can then be performed using the pre-built python packa
 
 .. code:: bash
 
-    pip install pyclipr
+    pip install pyclipr2
 
 Alternatively, pyclipr may be compiled directly from source within the python environment. Currently the prerequisites
 are the a compliant c++ build environment include CMake build system (>v3.15) and the availability of a compiler with
 c++17 compatibility.  Currently the package has been tested built using Windows 10, using VS2019 and Mac OSX Sonoma.
 
-Firstly, clone the PyClipr repository whilst ensuring that you perform the recurisve submodule when initialising
-the repoistory. This ensures that all dependencies (pybind, pyclipr, eigen, fmt) are downloaded into the source tree.
+Firstly, clone the PyClipr repository whilst ensuring that you perform the recursive submodule when initialising
+the repository. This ensures that all dependencies (pybind, pyclipr, eigen, fmt) are downloaded into the source tree.
 
 .. code:: bash
 
@@ -68,7 +68,7 @@ by using either `execute` or `execute2` methods, respectively.
 .. code:: python
 
     import numpy as np
-    import pyclipr
+    import pyclipr2 as pyclipr
 
     # Tuple definition of a path
     path = [(0.0, 0.), (0, 105.1234), (100, 105.1234), (100, 0), (0, 0)]

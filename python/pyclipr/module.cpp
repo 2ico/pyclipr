@@ -412,6 +412,63 @@ public:
     uint64_t scaleFactor;
 };
 
+std::vector<EigenVec2d> minkowskiSum(const py::array_t<double> &pattern_arr, const py::array_t<double> &path_arr, bool isClosed, double scaleFactor = 1000.0) {
+    if (pattern_arr.ndim() != 2) throw std::runtime_error("Pattern must be 2D array");
+    if (pattern_arr.shape(1) != 2) throw std::runtime_error("Pattern must have 2 columns (x,y)");
+    auto pat_r = pattern_arr.unchecked<2>();
+    Clipper2Lib::Path64 pattern(pat_r.shape(0));
+    for (Py_ssize_t i = 0; i < pat_r.shape(0); ++i) {
+        pattern[i] = Clipper2Lib::Point64(pat_r(i,0) * scaleFactor, pat_r(i,1) * scaleFactor);
+    }
+    if (path_arr.ndim() != 2) throw std::runtime_error("Path must be 2D array");
+    if (path_arr.shape(1) != 2) throw std::runtime_error("Path must have 2 columns (x,y)");
+    auto p_r = path_arr.unchecked<2>();
+    Clipper2Lib::Path64 path(p_r.shape(0));
+    for (Py_ssize_t i = 0; i < p_r.shape(0); ++i) {
+        path[i] = Clipper2Lib::Point64(p_r(i,0) * scaleFactor, p_r(i,1) * scaleFactor);
+    }
+    Clipper2Lib::Paths64 result = Clipper2Lib::MinkowskiSum(pattern, path, isClosed);
+    std::vector<EigenVec2d> out;
+    out.reserve(result.size());
+    for (const auto& respath : result) {
+        EigenVec2d eigPath(respath.size(), 2);
+        for (size_t i = 0; i < respath.size(); ++i) {
+            eigPath(i,0) = static_cast<double>(respath[i].x) / scaleFactor;
+            eigPath(i,1) = static_cast<double>(respath[i].y) / scaleFactor;
+        }
+        out.push_back(eigPath);
+    }
+    return out;
+}
+std::vector<EigenVec2d> minkowskiDiff(const py::array_t<double> &pattern_arr, const py::array_t<double> &path_arr, bool isClosed, double scaleFactor = 1000.0) {
+    if (pattern_arr.ndim() != 2) throw std::runtime_error("Pattern must be 2D array");
+    if (pattern_arr.shape(1) != 2) throw std::runtime_error("Pattern must have 2 columns (x,y)");
+    auto pat_r = pattern_arr.unchecked<2>();
+    Clipper2Lib::Path64 pattern(pat_r.shape(0));
+    for (Py_ssize_t i = 0; i < pat_r.shape(0); ++i) {
+        pattern[i] = Clipper2Lib::Point64(pat_r(i,0) * scaleFactor, pat_r(i,1) * scaleFactor);
+    }
+    if (path_arr.ndim() != 2) throw std::runtime_error("Path must be 2D array");
+    if (path_arr.shape(1) != 2) throw std::runtime_error("Path must have 2 columns (x,y)");
+    auto p_r = path_arr.unchecked<2>();
+    Clipper2Lib::Path64 path(p_r.shape(0));
+    for (Py_ssize_t i = 0; i < p_r.shape(0); ++i) {
+        path[i] = Clipper2Lib::Point64(p_r(i,0) * scaleFactor, p_r(i,1) * scaleFactor);
+    }
+    Clipper2Lib::Paths64 result = Clipper2Lib::MinkowskiDiff(pattern, path, isClosed);
+    std::vector<EigenVec2d> out;
+    out.reserve(result.size());
+    for (const auto& respath : result) {
+        EigenVec2d eigPath(respath.size(), 2);
+        for (size_t i = 0; i < respath.size(); ++i) {
+            eigPath(i,0) = static_cast<double>(respath[i].x) / scaleFactor;
+            eigPath(i,1) = static_cast<double>(respath[i].y) / scaleFactor;
+        }
+        out.push_back(eigPath);
+    }
+    return out;
+}
+
 } // end of namespace pyclipr
 
 PYBIND11_MODULE(pyclipr, m) {
@@ -752,6 +809,23 @@ PYBIND11_MODULE(pyclipr, m) {
          )
         .def("clear", &pyclipr::ClipperOffset::clear, R"(The clear method removes all the paths from the ClipperOffset object.)");
 
+
+    m.def("minkowskiSum", &pyclipr::minkowskiSum, py::arg("pattern"), py::arg("path"), py::arg("isClosed"), py::arg("scaleFactor") = 1000.0, R"(
+    Performs Minkowski sum on the pattern and path.
+    :param pattern: numpy array of shape (n,2)
+    :param path: numpy array of shape (m,2)
+    :param isClosed: whether the path is closed
+    :param scaleFactor: scaling for integer conversion
+    :return: list of resulting paths
+)");
+    m.def("minkowskiDiff", &pyclipr::minkowskiDiff, py::arg("pattern"), py::arg("path"), py::arg("isClosed"), py::arg("scaleFactor") = 1000.0, R"(
+    Performs Minkowski difference on the pattern and path.
+    :param pattern: numpy array of shape (n,2)
+    :param path: numpy array of shape (m,2)
+    :param isClosed: whether the path is closed
+    :param scaleFactor: scaling for integer conversion
+    :return: list of resulting paths
+)");
 
 
 #ifdef PROJECT_VERSION

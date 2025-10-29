@@ -150,11 +150,11 @@ class CMakeBuild(build_ext):
 
 
 setup(
-    name='pyclipr',
+    name='pyclipr2',
     version='0.1.7',
-    author='Luke Parry',
-    author_email='dev@lukeparry.uk',
-    url='https://github.com/drlukeparry/pyclipr',
+    author='2ico',
+    author_email='duico@pm.me',
+    url='https://github.com/2ico/pyclipr',
     long_description=readme,
     long_description_content_type = 'text/x-rst',
     description='Python library for polygon clipping and offsetting based on Clipper2.',
@@ -172,7 +172,6 @@ setup(
     zip_safe=False,
         classifiers=[
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
