@@ -1,4 +1,5 @@
 from typing import Any, Literal, Never, overload
+from typing import Sequence as _Sequence, Union as _Union
 
 import numpy as np
 import numpy.typing as npt
@@ -24,16 +25,16 @@ Intersection: ClipType = ...
 Xor: ClipType = ...
 
 
-class FillType:
-    EvenOdd: FillType = ...
-    NonZero: FillType = ...
-    Positive: FillType = ...
-    Negative: FillType = ...
+class FillRule:
+    EvenOdd: FillRule = ...
+    NonZero: FillRule = ...
+    Positive: FillRule = ...
+    Negative: FillRule = ...
 
-EvenOdd: FillType = ...
-NonZero: FillType = ...
-Positive: FillType = ...
-Negative: FillType = ...
+EvenOdd: FillRule = ...
+NonZero: FillRule = ...
+Positive: FillRule = ...
+Negative: FillRule = ...
 
 
 class JoinType:
@@ -41,8 +42,8 @@ class JoinType:
     Round: JoinType = ...
     Miter: JoinType = ...
 
-Square: JoinType = ...  # FIXME
-Round: JoinType = ...  # FIXME
+# Square: JoinType = ...  # FIXME
+# Round: JoinType = ...  # FIXME
 Miter: JoinType = ...
 
 
@@ -132,6 +133,7 @@ class Clipper:
     scaleFactor: float
     preserveCollinear: bool
 
+    @overload
     def addPath(
         self,
         path: npt.NDArray[np.float64],
@@ -139,6 +141,15 @@ class Clipper:
         isOpen: bool = ...
     ) -> None: ...
 
+    @overload
+    def addPath(
+        self,
+        path: _Sequence[_Sequence[_Union[int, float]]],
+        pathType: PathType,
+        isOpen: bool = ...
+    ) -> None: ...
+
+    @overload
     def addPaths(
         self,
         paths: list[npt.NDArray[np.float64]],
@@ -147,10 +158,18 @@ class Clipper:
     ) -> None: ...
 
     @overload
+    def addPaths(
+        self,
+        paths: _Sequence[_Sequence[_Sequence[_Union[int, float]]]],
+        pathType: PathType,
+        isOpen: bool = ...
+    ) -> None: ...
+
+    @overload
     def execute(
         self,
         clipType: ClipType,
-        fillType: FillType = ...,
+        fillRule: FillRule = ...,
         *,
         returnOpenPaths: Literal[False] = ...,
         returnZ: Literal[False] = ...
@@ -160,7 +179,7 @@ class Clipper:
     def execute(
         self,
         clipType: ClipType,
-        fillType: FillType = ...,
+        fillRule: FillRule = ...,
         *,
         returnOpenPaths: Literal[False] = ...,
         returnZ: Literal[True] = ...
@@ -174,7 +193,7 @@ class Clipper:
     def execute(
         self,
         clipType: ClipType,
-        fillType: FillType = ...,
+        fillRule: FillRule = ...,
         *,
         returnOpenPaths: Literal[True] = ...,
         returnZ: bool = ...
@@ -189,7 +208,7 @@ class Clipper:
     def execute2(
         self,
         clipType: ClipType,
-        fillType: FillType = ...,
+        fillRule: FillRule = ...,
         *,
         returnOpenPaths: Literal[False] = ...,
         returnZ: bool = ...
@@ -199,7 +218,31 @@ class Clipper:
     def execute2(
         self,
         clipType: ClipType,
-        fillType: FillType = ...,
+        fillRule: FillRule = ...,
+        *,
+        returnOpenPaths: Literal[True] = ...,
+        returnZ: bool = ...
+    ) -> tuple[
+        PolyTreeD,
+        list[npt.NDArray[np.float64]],
+        list[npt.NDArray[np.float64]]
+    ]: ...
+
+    @overload
+    def executeTree(
+        self,
+        clipType: ClipType,
+        fillRule: FillRule = ...,
+        *,
+        returnOpenPaths: Literal[False] = ...,
+        returnZ: bool = ...
+    ) -> PolyTreeD: ...
+
+    @overload
+    def executeTree(
+        self,
+        clipType: ClipType,
+        fillRule: FillRule = ...,
         *,
         returnOpenPaths: Literal[True] = ...,
         returnZ: bool = ...
@@ -245,6 +288,20 @@ class ClipperOffset:
     ) -> PolyTreeD: ...
 
     def clear(self) -> None: ...
+
+
+def minkowskiSum(
+    pattern: npt.NDArray[np.float64],
+    path: npt.NDArray[np.float64],
+    isClosed: bool,
+    scaleFactor: float = ...
+) -> list[npt.NDArray[np.float64]]: ...
+def minkowskiDiff(
+    pattern: npt.NDArray[np.float64],
+    path: npt.NDArray[np.float64],
+    isClosed: bool,
+    scaleFactor: float = ...
+) -> list[npt.NDArray[np.float64]]: ...
 
 
 __version__: str = ...

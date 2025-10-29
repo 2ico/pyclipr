@@ -90,10 +90,10 @@ Test the return types for open path clipping with option enabled. When The retur
 this will return the open paths. Note this function only works well using the Boolean intersection option
 """
 outC = pc2.execute(pyclipr.Intersection, pyclipr.FillRule.NonZero)
-outC2, openPathsC = pc2.execute(pyclipr.Intersection, pyclipr.FillRule.NonZero, returnOpenPaths=True)
+outC2, openPathsC, _, _= pc2.execute(pyclipr.Intersection, pyclipr.FillRule.NonZero, returnOpenPaths=True)
 
 outD = pc2.execute2(pyclipr.Intersection, pyclipr.FillRule.NonZero)
-outD2, openPathsD = pc2.execute2(pyclipr.Intersection, pyclipr.FillRule.NonZero, returnOpenPaths=True)
+outD2, openPathsD, _ = pc2.execute2(pyclipr.Intersection, pyclipr.FillRule.NonZero, returnOpenPaths=True)
 
 """
 Plot the results from the examples
