@@ -3,11 +3,12 @@ Pyclipr - Python Polygon and Offsetting Library (Clipper2 Bindings)
 
 .. image:: https://github.com/2ico/pyclipr/actions/workflows/pythonpublish.yml/badge.svg
     :target: https://github.com/2ico/pyclipr/actions
-.. image:: https://badge.fury.io/py/pyclipr.svg
-    :target: https://badge.fury.io/py/pyclipr
-.. image:: https://static.pepy.tech/personalized-badge/pyclipr?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads
- :target: https://pepy.tech/project/pyclipr
+.. image:: https://badge.fury.io/py/pyclipr2.svg
+    :target: https://badge.fury.io/py/pyclipr2
+.. image:: https://static.pepy.tech/personalized-badge/pyclipr2?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads
+ :target: https://pepy.tech/project/pyclipr2
 
+This fork of the original pyclipr library adds Python bindings for Minkowski sum and difference operations, which were not included in the upstream version. These operations enable advanced polygon manipulations, such as morphological expansions and contractions, useful for tasks like shape offsetting with rounded joins or buffering in GIS applications. See the `examples/example_minkowski.py` for usage.
 
 Pyclipr is a Python library offering the functionality of the `Clipper2 <http://www.angusj.com/clipper2/Docs/Overview.htm>`_
 polygon clipping and offsetting library and are built upon `pybind <https://pybind11.readthedocs.io/en/stable/basics.html>`_ .
@@ -18,7 +19,7 @@ Unlike `pyclipper <https://pypi.org/project/pyclipper/>`_, this library is not b
 capability pybind is exploited. This library aims to provide convenient access to the Clipper2 library for Python users,
 especially with its usage in 3D Printing and computer graphics applications.
 
-For further information, see the latest `release notes <https://github.com/drlukeparry/pycork/blob/master/CHANGELOG.md>`_.
+For further information, see the latest `release notes <https://github.com/drlukeparry/pyclipr/blob/master/CHANGELOG.md>`_.
 
 Installation
 *************
