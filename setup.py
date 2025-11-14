@@ -6,7 +6,6 @@ import subprocess
 
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
-from distutils.version import LooseVersion
 
 from setuptools.command.develop import develop
 from setuptools.command.install import install
@@ -103,8 +102,11 @@ class CMakeBuild(build_ext):
                                ", ".join(e.name for e in self.extensions))
 
         if platform.system() == "Windows":
-            cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
-            if cmake_version < '3.12.0':
+            match = re.search(r'version\s*([\d.]+)', out.decode())
+            if not match:
+                raise RuntimeError("Could not parse CMake version from output")
+            parts = [int(p) for p in match.group(1).split('.')]
+            if len(parts) < 2 or parts[0] < 3 or (parts[0] == 3 and parts[1] < 12):
                 raise RuntimeError("CMake >= 3.12.0 is required on Windows")
 
         for ext in self.extensions:
@@ -151,7 +153,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='pyclipr2',
-    version='0.1.7',
+    version='0.1.8',
     author='2ico',
     author_email='duico@pm.me',
     url='https://github.com/2ico/pyclipr',
