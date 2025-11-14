@@ -49,7 +49,6 @@ if(WIN32)
         add_compile_options("/GS-"
                             "/INCREMENTAL:NO")
 
-
     endif(MSVC)
 
     # Copy the shared libraries and libs to the main directory
@@ -66,8 +65,8 @@ else(WIN32)
     #target_compile_options(Clipper2 PRIVATE -Wall -Wextra -Wpedantic -Werror)
     #target_link_libraries(Clipper2 PUBLIC -lm)
 
-    # Find Required packages
-    find_package(Eigen3 3.3 REQUIRED)
+    # Use bundled Eigen for all platforms - no system find_package
+    set(EIGEN3_INCLUDE_DIR external/eigen)
 
 endif(WIN32)
 
