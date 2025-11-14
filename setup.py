@@ -6,7 +6,6 @@ import subprocess
 
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
-from distutils.version import LooseVersion
 
 from setuptools.command.develop import develop
 from setuptools.command.install import install
@@ -24,6 +23,13 @@ submoduleVersions = {
     'clipper2': 'Clipper2_1.3.0',
     'pybind11': 'v2.11',
     'eigen': '3.4'
+}
+
+# Remote URLs for submodules to ensure fetch works
+submoduleRemotes = {
+    'clipper2': 'https://github.com/AngusJohnson/Clipper2.git',
+    'pybind11': 'https://github.com/pybind/pybind11.git',
+    'eigen': 'https://gitlab.com/libeigen/eigen.git'
 }
 
 class CMakeExtension(Extension):
@@ -52,7 +58,17 @@ def gitcmd_update_submodules():
 
             import subprocess
 
-            process = subprocess.Popen(['git', 'checkout', v], cwd=modPath)
+            # Ensure origin remote is set
+            remote_url = submoduleRemotes[k]
+            try:
+                check_output(['git', 'remote', 'get-url', 'origin'], cwd=modPath)
+            except subprocess.CalledProcessError:
+                check_call(['git', 'remote', 'add', 'origin', remote_url], cwd=modPath)
+
+            # Fetch only the specific required tag to avoid conflicts
+            check_call(['git', 'fetch', 'origin', f'{v}:refs/tags/{v}'], cwd=modPath)
+            # Use check_call to raise on failure
+            check_call(['git', 'checkout', v], cwd=modPath)
 
 
         check_call(['git', 'submodule', 'status'])
@@ -103,8 +119,11 @@ class CMakeBuild(build_ext):
                                ", ".join(e.name for e in self.extensions))
 
         if platform.system() == "Windows":
-            cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
-            if cmake_version < '3.12.0':
+            match = re.search(r'version\s*([\d.]+)', out.decode())
+            if not match:
+                raise RuntimeError("Could not parse CMake version from output")
+            parts = [int(p) for p in match.group(1).split('.')]
+            if len(parts) < 2 or parts[0] < 3 or (parts[0] == 3 and parts[1] < 12):
                 raise RuntimeError("CMake >= 3.12.0 is required on Windows")
 
         for ext in self.extensions:
@@ -151,12 +170,12 @@ class CMakeBuild(build_ext):
 
 setup(
     name='pyclipr2',
-    version='0.1.7',
+    version='0.1.9',
     author='2ico',
     author_email='duico@pm.me',
     url='https://github.com/2ico/pyclipr',
     long_description=readme,
-    long_description_content_type = 'text/x-rst',
+    long_description_content_type = 'text/plain',
     description='Python library for polygon clipping and offsetting based on Clipper2.',
     ext_modules=[CMakeExtension('pyclipr.pyclipr', 'pyclipr')],
     cmdclass= {
