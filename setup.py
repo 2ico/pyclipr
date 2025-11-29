@@ -25,6 +25,13 @@ submoduleVersions = {
     'eigen': '3.4'
 }
 
+# Remote URLs for submodules to ensure fetch works
+submoduleRemotes = {
+    'clipper2': 'https://github.com/AngusJohnson/Clipper2.git',
+    'pybind11': 'https://github.com/pybind/pybind11.git',
+    'eigen': 'https://gitlab.com/libeigen/eigen.git'
+}
+
 class CMakeExtension(Extension):
     def __init__(self, name, modName, sourcedir=''):
 
@@ -51,7 +58,17 @@ def gitcmd_update_submodules():
 
             import subprocess
 
-            process = subprocess.Popen(['git', 'checkout', v], cwd=modPath)
+            # Ensure origin remote is set
+            remote_url = submoduleRemotes[k]
+            try:
+                check_output(['git', 'remote', 'get-url', 'origin'], cwd=modPath)
+            except subprocess.CalledProcessError:
+                check_call(['git', 'remote', 'add', 'origin', remote_url], cwd=modPath)
+
+            # Fetch only the specific required tag to avoid conflicts with other tags
+            check_call(['git', 'fetch', 'origin', f'{v}'], cwd=modPath)
+            # Use check_call instead of Popen to raise on failure
+            check_call(['git', 'checkout', v], cwd=modPath)
 
 
         check_call(['git', 'submodule', 'status'])
