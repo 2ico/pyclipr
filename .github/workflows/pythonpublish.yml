@@ -38,6 +38,11 @@ jobs:
       if: matrix.os == 'macos-latest' || matrix.os == 'macos-14'
       run: |
         brew install eigen
+        # Help CMake find brew-installed packages on macOS (especially Apple Silicon)
+        echo "CMAKE_PREFIX_PATH=/opt/homebrew:\$CMAKE_PREFIX_PATH" >> $GITHUB_ENV
+        echo "PKG_CONFIG_PATH=/opt/homebrew/lib/pkgconfig:\$PKG_CONFIG_PATH" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=/opt/homebrew/lib:\$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
     - name: Install dependencies
       run: |
         python3 -m pip install --upgrade pip
