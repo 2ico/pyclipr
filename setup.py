@@ -65,9 +65,9 @@ def gitcmd_update_submodules():
             except subprocess.CalledProcessError:
                 check_call(['git', 'remote', 'add', 'origin', remote_url], cwd=modPath)
 
-            # Fetch only the specific required tag to avoid conflicts with other tags
-            check_call(['git', 'fetch', 'origin', f'{v}'], cwd=modPath)
-            # Use check_call instead of Popen to raise on failure
+            # Fetch only the specific required tag to avoid conflicts
+            check_call(['git', 'fetch', 'origin', f'{v}:refs/tags/{v}'], cwd=modPath)
+            # Use check_call to raise on failure
             check_call(['git', 'checkout', v], cwd=modPath)
 
 
