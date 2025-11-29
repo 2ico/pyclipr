@@ -145,6 +145,10 @@ class CMakeBuild(build_ext):
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DBUILD_PYTHON=ON']
 
+        # Explicitly set Eigen include for macOS CI (brew path)
+        if platform.system() == "Darwin":
+            cmake_args += ['-DEIGEN3_INCLUDE_DIR=/opt/homebrew/include/eigen3']
+
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
 
