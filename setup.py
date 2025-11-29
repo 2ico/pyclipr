@@ -170,12 +170,12 @@ class CMakeBuild(build_ext):
 
 setup(
     name='pyclipr2',
-    version='0.1.8',
+    version='0.1.9',
     author='2ico',
     author_email='duico@pm.me',
     url='https://github.com/2ico/pyclipr',
     long_description=readme,
-    long_description_content_type = 'text/x-rst',
+    long_description_content_type = 'text/plain',
     description='Python library for polygon clipping and offsetting based on Clipper2.',
     ext_modules=[CMakeExtension('pyclipr.pyclipr', 'pyclipr')],
     cmdclass= {
